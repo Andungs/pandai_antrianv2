@@ -1,9 +1,9 @@
 services:
-  pandaiantrian_api:
+  pandaiantrian-api:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    container_name: pandaiantrian_api
+    container_name: pandaiantrian-api
     restart: always
     volumes:
       - .:/var/www
