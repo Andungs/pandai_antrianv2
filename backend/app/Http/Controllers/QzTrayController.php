@@ -28,7 +28,7 @@ class QzTrayController extends Controller
      */
     public function sign(Request $request): \Illuminate\Http\Response|JsonResponse
     {
-        $message = $request->query('request');
+        $message = $request->input('request');
         
         if (!$message) {
             return response()->json(['message' => 'Parameter request dibutuhkan.'], 400);

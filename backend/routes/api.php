@@ -40,7 +40,7 @@ Route::prefix('guest')->group(function () {
 
     // QZTray Certificate & Signing
     Route::get('/qz-certs', [\App\Http\Controllers\QzTrayController::class, 'certificate']);
-    Route::get('/qz-sign', [\App\Http\Controllers\QzTrayController::class, 'sign']);
+    Route::post('/qz-sign', [\App\Http\Controllers\QzTrayController::class, 'sign']);
 
     // Public settings (QZTray certificate)
     Route::get('/settings/qztray-certificate', [AdminSettingController::class, 'downloadQzTrayCertificate']);

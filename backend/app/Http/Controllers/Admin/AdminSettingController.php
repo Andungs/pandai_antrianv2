@@ -84,13 +84,13 @@ class AdminSettingController extends Controller
 
         // Generate self-signed certificate (100 tahun = 36500 hari)
         $dn = [
-            'commonName'         => config('app.name', 'Pandai Antrian'),
+            'commonName'         => 'localhost',
             'organizationName'   => 'Pandai Antrian System',
             'countryName'        => 'ID',
         ];
 
-        $csr = openssl_csr_new($dn, $privateKey);
-        $cert = openssl_csr_sign($csr, null, $privateKey, 36500);
+        $csr = openssl_csr_new($dn, $privateKey, ['digest_alg' => 'sha512']);
+        $cert = openssl_csr_sign($csr, null, $privateKey, 36500, ['digest_alg' => 'sha512']);
 
         // Export
         openssl_pkey_export_to_file($privateKey, $keyPath);
