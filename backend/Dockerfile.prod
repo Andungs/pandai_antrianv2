@@ -1,0 +1,28 @@
+FROM php:8.4-cli
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git vim unzip curl libzip-dev libpng-dev libonig-dev libxml2-dev libssl-dev libbrotli-dev pkg-config \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip pcntl sockets bcmath gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Swoole
+RUN pecl install swoole && docker-php-ext-enable swoole
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+# Copy all project files
+COPY . .
+
+RUN chown -R www-data:www-data /var/www && \
+    chmod -R 777 storage bootstrap/cache
+
+EXPOSE 8000
+# Copy startup script
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+CMD ["/usr/local/bin/start.sh"]

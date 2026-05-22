@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  queue_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: pandaihost_queue_worker
+    restart: always
+    command: bash -c "while [ ! -f vendor/autoload.php ]; do sleep 5; done; php artisan queue:work database --queue=default --tries=3 --backoff=10,30,60 --sleep=3 --timeout=120"
+    volumes:
+      - .:/var/www
+    networks:
+      - cloud-container
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: pandaihost_scheduler
+    restart: always
+    command: bash -c "while [ ! -f vendor/autoload.php ]; do sleep 5; done; php artisan schedule:work"
+    volumes:
+      - .:/var/www
+    networks:
+      - cloud-container
+
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: pandaihost_reverb
+    restart: always
+    command: bash -c "while [ ! -f vendor/autoload.php ]; do sleep 5; done; php artisan reverb:start --host=0.0.0.0 --port=8080"
+    volumes:
+      - .:/var/www
+    networks:
+      cloud-container:
+        ipv4_address: 10.10.10.8
+
+networks:
+  cloud-container:
+    external: true
+

@@ -1,0 +1,23 @@
+services:
+  pandaihost_frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        # Nilai dibaca dari file .env yang ada di direktori ini
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_TERMINAL_URL: ${VITE_TERMINAL_URL}
+        VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY}
+        VITE_REVERB_APP_KEY: ${VITE_REVERB_APP_KEY}
+        VITE_REVERB_HOST: ${VITE_REVERB_HOST}
+        VITE_REVERB_PORT: ${VITE_REVERB_PORT}
+        VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME}
+    container_name: pandaihost_frontend
+    restart: always
+    networks:
+      cloud-container:
+        ipv4_address: 10.10.10.5
+
+networks:
+  cloud-container:
+    external: true

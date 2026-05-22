@@ -1,0 +1,30 @@
+services:
+  pandaihost_api:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: pandaihost_api
+    restart: always
+    volumes:
+      - .:/var/www
+    networks:
+      cloud-container:
+        ipv4_address: 10.10.10.4
+
+  terminal-server:
+    image: node:20-alpine
+    container_name: pandaihost_terminal
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./terminal-server:/app
+    command: sh -c "npm install && node server.js"
+    # ports:
+    #   - "8092:8092"
+    networks:
+      cloud-container:
+        ipv4_address: 10.10.10.6
+
+networks:
+  cloud-container:
+    external: true

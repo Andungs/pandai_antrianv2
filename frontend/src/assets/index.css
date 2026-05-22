@@ -1,0 +1,283 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    /* Primary: Sky Blue */
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 199 89% 48%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 199 89% 48%;
+  }
+  .theme {
+    --font-heading: var(--font-sans);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* =============================================
+   GLOBAL DESIGN SYSTEM
+   ============================================= */
+
+/* ── 1. Standardized Button Size ─── */
+@layer components {
+  .btn-std {
+    @apply h-10 px-4 py-2 text-sm font-medium rounded-lg inline-flex items-center gap-2 transition-all;
+  }
+  .btn-std-sm {
+    @apply h-8 px-3 py-1.5 text-xs font-medium rounded-md inline-flex items-center gap-1.5 transition-all;
+  }
+  .btn-std-lg {
+    @apply h-12 px-6 py-2.5 text-base font-medium rounded-xl inline-flex items-center gap-2 transition-all;
+  }
+
+  [data-slot="button"]:not([data-size="xs"]):not([data-size="sm"]):not([data-size="lg"]):not([data-size="icon"]):not([data-size="icon-sm"]):not([data-size="icon-lg"]) {
+    height: 2.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* ── 2. Standardized Form Inputs ─── */
+@layer components {
+  .form-input-std {
+    @apply h-10 w-full rounded-lg border border-input bg-background px-3 text-sm 
+           ring-offset-background placeholder:text-muted-foreground
+           focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+           disabled:cursor-not-allowed disabled:opacity-50 transition-all;
+  }
+  
+  .form-select-std {
+    @apply h-10 w-full rounded-lg border border-input bg-background px-3 text-sm
+           focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+           disabled:cursor-not-allowed disabled:opacity-50 transition-all;
+  }
+
+  input[data-slot="input"],
+  input.app-input {
+    height: 2.5rem !important;
+  }
+}
+
+/* ── 3. Modal Transitions ─── */
+@layer utilities {
+  .modal-enter-active {
+    transition: all 0.25s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+  .modal-leave-active {
+    transition: all 0.18s ease-in;
+  }
+  .modal-enter-from {
+    opacity: 0;
+    transform: scale(0.94) translateY(10px);
+  }
+  .modal-leave-to {
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+  }
+
+  .modal-backdrop-enter-active { transition: opacity 0.2s ease; }
+  .modal-backdrop-leave-active { transition: opacity 0.18s ease; }
+  .modal-backdrop-enter-from,
+  .modal-backdrop-leave-to { opacity: 0; }
+}
+
+/* ── 4. FadeUp Page Animation ─── */
+@layer utilities {
+  .fadeup-enter-active {
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fadeup-enter-from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  .fadeup-stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .fadeup-stagger > *:nth-child(2) { animation-delay: 60ms; }
+  .fadeup-stagger > *:nth-child(3) { animation-delay: 120ms; }
+  .fadeup-stagger > *:nth-child(4) { animation-delay: 180ms; }
+  .fadeup-stagger > *:nth-child(5) { animation-delay: 240ms; }
+  .fadeup-stagger > *:nth-child(6) { animation-delay: 300ms; }
+
+  @keyframes fadeup {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fadeup {
+    animation: fadeup 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .delay-75  { animation-delay: 75ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-225 { animation-delay: 225ms; }
+  .delay-300 { animation-delay: 300ms; }
+
+  .fade-enter-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+  .fade-leave-active { transition: opacity 0.15s ease; }
+  .fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(5px); }
+}
+
+/* ── 5. Skeleton Loader ─── */
+@layer components {
+  .skeleton {
+    @apply rounded-md bg-slate-200 dark:bg-slate-800 relative overflow-hidden;
+  }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    animation: shimmer 1.4s infinite;
+    transform: translateX(-100%);
+  }
+  .dark .skeleton::after {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  }
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+}
+
+/* ── 6. DataTable Styles ─── */
+@layer components {
+  .data-table {
+    @apply w-full text-sm;
+  }
+  .data-table thead tr {
+    @apply bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800;
+  }
+  .data-table thead th {
+    @apply px-4 py-3 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap;
+  }
+  .data-table tbody tr {
+    @apply border-b border-slate-100 dark:border-slate-800/60 transition-colors;
+  }
+  .data-table tbody tr:hover {
+    @apply bg-slate-50/70 dark:bg-slate-800/30;
+  }
+  .data-table tbody td {
+    @apply px-4 py-3.5 text-sm align-middle;
+  }
+  .data-table tbody tr:last-child {
+    @apply border-0;
+  }
+}
+
+/* ── 7. Scrollbar ─── */
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  
+  .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
+}
+
+/* ── 8. KIOSK & Display Specific ─── */
+@layer utilities {
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px 0 rgba(14, 165, 233, 0.3); }
+    50% { box-shadow: 0 0 40px 8px rgba(14, 165, 233, 0.5); }
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes slide-up-bounce {
+    0% { opacity: 0; transform: translateY(60px) scale(0.9); }
+    60% { transform: translateY(-8px) scale(1.02); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .animate-slide-up-bounce {
+    animation: slide-up-bounce 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes number-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-number-pop {
+    animation: number-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+  .animate-marquee {
+    animation: marquee 20s linear infinite;
+  }
+}
