@@ -1,5 +1,5 @@
 services:
-  pandaihost_frontend:
+  pandaiantrian-frontend:
     build:
       context: .
       dockerfile: Dockerfile.prod
@@ -12,7 +12,7 @@ services:
         VITE_REVERB_HOST: ${VITE_REVERB_HOST}
         VITE_REVERB_PORT: ${VITE_REVERB_PORT}
         VITE_REVERB_SCHEME: ${VITE_REVERB_SCHEME}
-    container_name: pandaihost_frontend
+    container_name: pandaiantrian-frontend
     restart: always
     networks:
       cloud-container:
