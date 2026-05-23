@@ -407,7 +407,7 @@ onMounted(() => {
     <!-- ══ FOOTER ══════════════════════════════════════════════════════════ -->
     <footer class="relative z-10 text-center py-4 px-6">
       <p class="text-xs text-slate-400 dark:text-slate-600 font-medium">
-        &copy; {{ new Date().getFullYear() }} {{ settings.app_name }} &bull; Powered by Pandai Antrian
+        &copy; {{ new Date().getFullYear() }} {{ settings.app_name }} &bull; Powered by PT. Pintu Data Indonesia
       </p>
     </footer>
   </div>
