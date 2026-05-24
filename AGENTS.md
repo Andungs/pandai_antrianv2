@@ -14,16 +14,20 @@ Aplikasi `Pandai Antrian` menggunakan arsitektur terpisah (Headless API) antara 
 - **WebSockets:** Laravel Reverb (Berjalan di port `8099`)
 - **Port API:** Berjalan di port `8092`
 - **Authentication:** Laravel Sanctum (Token-based)
+- **Production Server:** Laravel Octane + Swoole (via `Dockerfile.prod`)
 
 ### Frontend (SPA Client)
 - **Framework:** Vue 3 (Composition API, `<script setup>`) + Vite
 - **Styling:** Tailwind CSS + custom CSS variables
 - **UI Components:** shadcn-vue (Radix Vue), lucide-vue-next, `@vueform/multiselect`
 - **Pusher Client:** `pusher-js` & `laravel-echo` untuk menangkap event WebSocket
+- **Thermal Printing:** `qz-tray` npm package + composable `useQZTray.ts`
 
-### Docker Environment
-- **pandaiantrian-api:** Container untuk Laravel backend.
-- **pandaiantrian-reverb:** Container khusus untuk worker WebSocket Reverb.
+### Docker Environment (Production)
+- **pandaiantrian-api:** Container utama Laravel backend (Octane/Swoole, port 8000 internal).
+- **pandaiantrian-reverb:** Container khusus untuk worker WebSocket Reverb (port 8080 internal → 8099 host).
+- **pandaiantrian-queue:** Container worker untuk job queue (`queue:work database`).
+- **Volume Strategy (PENTING):** Di production, JANGAN mount seluruh direktori proyek (`.:/var/www`). Hanya mount data persisten: `storage/app`, `database/`, dan `.env`. Mount seluruh direktori akan menimpa `vendor/` yang sudah di-build di dalam image Docker, menyebabkan error dependensi.
 - Frontend di-*serve* menggunakan *local development server* (Vite) atau Nginx (Production).
 
 ---
@@ -35,7 +39,14 @@ Aplikasi `Pandai Antrian` menggunakan arsitektur terpisah (Headless API) antara 
 2. Memilih **Layanan** (Service).
 3. `POST /api/guest/queues` dipanggil. Backend me-return Nomor Antrean.
 4. Backend memancarkan (broadcast) event `QueueUpdated`.
-5. Frontend memutar animasi pop-up dan mencetak tiket via **QZTray (Thermal Printer)** (dalam tahap pengembangan).
+5. Frontend memutar animasi pop-up dan mencetak tiket via **QZTray (Thermal Printer)** menggunakan ESC/POS raw commands.
+
+### C. Pencetakan Tiket Thermal (QZTray)
+1. Sertifikat digital di-generate dari menu **Pengaturan** (`AdminSettingController::generateQzTrayCertificate`).
+2. Sertifikat (public cert + private key) disimpan di tabel `settings` (key: `qztray_certificate`, `qztray_private_key`).
+3. Frontend KIOSK memanggil `GET /api/guest/qz-certs` untuk certificate dan `POST /api/guest/qz-sign` untuk signing.
+4. Composable `useQZTray.ts` mengirim perintah ESC/POS raw ke printer thermal via QZTray WebSocket lokal.
+5. Nama printer dikonfigurasi di tabel `settings` (key: `printer_name`).
 
 ### B. Pemanggilan Antrean (LOKET)
 1. Petugas Loket / Superadmin login ke `/dashboard`.
