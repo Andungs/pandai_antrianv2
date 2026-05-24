@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { TicketCheck, Clock, Users, ChevronRight, Camera, Printer, X, RefreshCw } from 'lucide-vue-next'
 import axios from 'axios'
 import { useQZTray } from '@/composables/useQZTray'
+import { echo } from '@/lib/echo'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8092/api'
 
@@ -174,11 +175,35 @@ function cancelCamera() {
   selectedService.value = null
 }
 
+let echoChannel: any = null
+
 onMounted(() => {
   fetchServices()
   connect().catch(e => console.error('Initial QZTray connect error:', e))
   // Update clock
   setInterval(() => { currentTime.value = new Date() }, 1000)
+
+  // Listen for real-time queue updates to refresh waiting counts
+  echoChannel = echo.channel('queue.updates')
+  echoChannel.listen('.App\\Events\\QueueUpdated', () => {
+    // Only refresh waiting counts if we're on the service selection screen
+    if (step.value === 'select') {
+      fetchServices()
+    }
+  })
+  echoChannel.listen('.App\\Events\\QueueCalled', () => {
+    if (step.value === 'select') {
+      fetchServices()
+    }
+  })
+})
+
+onUnmounted(() => {
+  if (echoChannel) {
+    echoChannel.stopListening('.App\\Events\\QueueUpdated')
+    echoChannel.stopListening('.App\\Events\\QueueCalled')
+    echo.leaveChannel('queue.updates')
+  }
 })
 </script>
 
@@ -193,8 +218,9 @@ onMounted(() => {
     <!-- ══ HEADER ══════════════════════════════════════════════════════════ -->
     <header class="relative z-10 flex items-center justify-between px-6 sm:px-10 py-5">
       <div class="flex items-center gap-3">
-        <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/30">
-          <TicketCheck class="h-6 w-6 text-white" />
+        <div class="h-12 w-12 rounded-2xl overflow-hidden flex items-center justify-center shadow-lg" :class="settings.app_logo ? 'bg-transparent shadow-none' : 'bg-gradient-to-br from-sky-500 to-blue-600 shadow-sky-500/30'">
+          <img v-if="settings.app_logo" :src="settings.app_logo" alt="Logo" class="h-full w-full object-contain" />
+          <TicketCheck v-else class="h-6 w-6 text-white" />
         </div>
         <div>
           <h1 class="text-xl font-black tracking-tight text-slate-800 dark:text-white">{{ settings.app_name }}</h1>

@@ -30,7 +30,7 @@ const currentTime = ref(new Date())
 const loading = ref(true)
 
 // Sound activation (browser autoplay policy requires user gesture)
-const soundEnabled = ref(false)
+const soundEnabled = ref(true)
 
 // The counter that is currently calling (most recent call event)
 const activeCallCounter = ref<{ counter_id: number; counter_name: string; queue_number: string; service_name: string } | null>(null)
@@ -39,8 +39,7 @@ const activeCallCounter = ref<{ counter_id: number; counter_name: string; queue_
 const flashingCounterId = ref<number | null>(null)
 const isSpeaking = ref(false)
 
-// Pending announcement queue (calls that arrive before sound is enabled)
-const pendingAnnouncement = ref<{ queueNumber: string; counterName: string } | null>(null)
+
 
 // Time
 const formattedTime = computed(() =>
@@ -73,15 +72,7 @@ const statusBadge = (status: string) => {
     : 'bg-sky-100 text-sky-700 border-sky-200 animate-pulse'
 }
 
-// Enable sound on user click
-function enableSound() {
-  soundEnabled.value = true
-  // Play pending announcement if any
-  if (pendingAnnouncement.value) {
-    speakAnnouncement(pendingAnnouncement.value.queueNumber, pendingAnnouncement.value.counterName)
-    pendingAnnouncement.value = null
-  }
-}
+
 
 // Fetch display data
 async function fetchDisplay() {
@@ -110,12 +101,7 @@ async function fetchDisplay() {
 // TTS — with sound gate
 function speakAnnouncement(queueNumber: string, counterName: string) {
   if (!('speechSynthesis' in window)) return
-
-  // If sound not enabled yet, queue it
-  if (!soundEnabled.value) {
-    pendingAnnouncement.value = { queueNumber, counterName }
-    return
-  }
+  if (!soundEnabled.value) return
 
   window.speechSynthesis.cancel()
   isSpeaking.value = true
@@ -224,23 +210,7 @@ onMounted(() => {
 <template>
   <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50/50 text-slate-900 font-sans overflow-hidden relative flex flex-col">
 
-    <!-- ═══ SOUND ACTIVATION OVERLAY ═════════════════════════════════ -->
-    <transition name="fade">
-      <div
-        v-if="!soundEnabled"
-        @click="enableSound"
-        class="fixed inset-0 z-[100] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center cursor-pointer select-none"
-      >
-        <div class="relative mb-8">
-          <div class="h-32 w-32 rounded-full bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center shadow-2xl shadow-sky-500/30 animate-pulse">
-            <Volume2 class="h-16 w-16 text-white" />
-          </div>
-          <div class="absolute inset-0 h-32 w-32 rounded-full bg-sky-500/20 animate-ping"></div>
-        </div>
-        <h2 class="text-3xl font-black text-slate-800 mb-3">Aktifkan Suara</h2>
-        <p class="text-lg text-slate-500 font-medium">Klik di mana saja untuk mengaktifkan panggilan suara</p>
-      </div>
-    </transition>
+
 
     <!-- ═══ HEADER ══════════════════════════════════════════════════════ -->
     <header class="relative z-10 flex items-center justify-between px-8 py-5 bg-white/80 backdrop-blur-sm border-b border-slate-200 shadow-sm">

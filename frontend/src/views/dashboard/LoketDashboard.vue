@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { api, useAuthStore } from '@/stores/auth'
 import {
@@ -7,6 +7,7 @@ import {
   RotateCcw, Users, Clock, Loader2, TicketCheck, Monitor
 } from 'lucide-vue-next'
 import Swal from 'sweetalert2'
+import { echo } from '@/lib/echo'
 
 const auth = useAuthStore()
 const loading = ref(true)
@@ -203,9 +204,30 @@ const formatTime = (dt: string | null) => {
   return new Date(dt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
 }
 
+let echoChannel: any = null
+
 onMounted(() => {
   fetchCurrent()
   fetchHistory()
+
+  // Listen for real-time queue updates to refresh waiting count
+  echoChannel = echo.channel('queue.updates')
+  echoChannel.listen('.App\\Events\\QueueUpdated', () => {
+    fetchCurrent()
+    fetchHistory()
+  })
+  echoChannel.listen('.App\\Events\\QueueCalled', () => {
+    fetchCurrent()
+    fetchHistory()
+  })
+})
+
+onUnmounted(() => {
+  if (echoChannel) {
+    echoChannel.stopListening('.App\\Events\\QueueUpdated')
+    echoChannel.stopListening('.App\\Events\\QueueCalled')
+    echo.leaveChannel('queue.updates')
+  }
 })
 </script>
 
