@@ -39,6 +39,10 @@ const activeCallCounter = ref<{ counter_id: number; counter_name: string; queue_
 const flashingCounterId = ref<number | null>(null)
 const isSpeaking = ref(false)
 
+// Announcement Queue (untuk menangani panggilan bersamaan)
+const announcementQueue = ref<{ queue_number: string; counter_id: number; counter_name: string; service_name: string }[]>([])
+const isProcessingQueue = ref(false)
+
 
 
 // Time
@@ -99,9 +103,12 @@ async function fetchDisplay() {
 }
 
 // TTS — with sound gate
-function speakAnnouncement(queueNumber: string, counterName: string) {
-  if (!('speechSynthesis' in window)) return
-  if (!soundEnabled.value) return
+function speakAnnouncement(queueNumber: string, counterName: string, onFinished: () => void) {
+  if (!('speechSynthesis' in window) || !soundEnabled.value) {
+    // Tunggu visual sebentar jika suara dimatikan/tidak support, lalu lanjut ke antrean berikutnya
+    setTimeout(onFinished, 4000)
+    return
+  }
 
   window.speechSynthesis.cancel()
   isSpeaking.value = true
@@ -126,22 +133,32 @@ function speakAnnouncement(queueNumber: string, counterName: string) {
     const idVoice = voices.find(v => v.lang.startsWith('id'))
     if (idVoice) utterance.voice = idVoice
     utterance.onend = () => {
-      if (times > 1) setTimeout(() => speak(times - 1), 1200)
-      else isSpeaking.value = false
+      if (times > 1) {
+        setTimeout(() => speak(times - 1), 1200)
+      } else {
+        isSpeaking.value = false
+        onFinished()
+      }
     }
-    utterance.onerror = () => { isSpeaking.value = false }
+    utterance.onerror = () => { 
+      isSpeaking.value = false
+      onFinished() 
+    }
     window.speechSynthesis.speak(utterance)
   }
   speak(2)
 }
 
+let flashTimeout: any = null
 function triggerFlash(counterId: number) {
   flashingCounterId.value = counterId
-  setTimeout(() => { flashingCounterId.value = null }, 6000)
+  if (flashTimeout) clearTimeout(flashTimeout)
+  flashTimeout = setTimeout(() => { flashingCounterId.value = null }, 6000)
 }
 
 // Handle broadcast event
 function handleQueueCalled(data: { queue_number: string; counter_id: number; counter_name: string; service_name: string; action: string }) {
+  // Update the small cards list immediately
   const counter = counters.value.find(c => c.id === data.counter_id)
   if (counter) {
     counter.current_queue = {
@@ -151,15 +168,46 @@ function handleQueueCalled(data: { queue_number: string; counter_id: number; cou
     }
   }
 
-  activeCallCounter.value = {
+  // Masukkan ke antrean panggilan
+  announcementQueue.value.push({
+    queue_number: data.queue_number,
     counter_id: data.counter_id,
     counter_name: data.counter_name,
-    queue_number: data.queue_number,
-    service_name: data.service_name,
+    service_name: data.service_name
+  })
+
+  // Jika tidak ada yang sedang diproses, jalankan queue
+  if (!isProcessingQueue.value) {
+    processAnnouncementQueue()
+  }
+}
+
+function processAnnouncementQueue() {
+  if (announcementQueue.value.length === 0) {
+    isProcessingQueue.value = false
+    return
   }
 
-  triggerFlash(data.counter_id)
-  speakAnnouncement(data.queue_number, data.counter_name)
+  isProcessingQueue.value = true
+  const currentAnnouncement = announcementQueue.value.shift()!
+
+  // Update big screen
+  activeCallCounter.value = {
+    counter_id: currentAnnouncement.counter_id,
+    counter_name: currentAnnouncement.counter_name,
+    queue_number: currentAnnouncement.queue_number,
+    service_name: currentAnnouncement.service_name,
+  }
+  
+  triggerFlash(currentAnnouncement.counter_id)
+
+  // Play sound & wait for it to finish
+  speakAnnouncement(currentAnnouncement.queue_number, currentAnnouncement.counter_name, () => {
+    // Jeda 1 detik antar panggilan jika ada panggilan beruntun
+    setTimeout(() => {
+      processAnnouncementQueue()
+    }, 1000)
+  })
 }
 
 // Handle queue status update
