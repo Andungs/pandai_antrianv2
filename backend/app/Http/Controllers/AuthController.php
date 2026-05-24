@@ -57,7 +57,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         $user = $request->user();
-        $user->load('counter.service');
+        $user->load('counters.services');
 
         return response()->json([
             'user' => $this->formatUser($user),
@@ -69,7 +69,7 @@ class AuthController extends Controller
      */
     private function formatUser(User $user): array
     {
-        $user->loadMissing('counter.service');
+        $user->loadMissing('counters.services');
 
         $data = [
             'id'        => $user->id,
@@ -78,14 +78,18 @@ class AuthController extends Controller
             'role_type' => $user->role_type,
         ];
 
-        // Jika user loket, sertakan info counter
-        if ($user->counter) {
-            $data['counter'] = [
-                'id'           => $user->counter->id,
-                'name'         => $user->counter->name,
-                'service_id'   => $user->counter->service_id,
-                'service_name' => $user->counter->service?->name,
-            ];
+        // Jika user loket, sertakan info counters yang bisa mereka pilih
+        if ($user->counters && $user->counters->count() > 0) {
+            $data['counters'] = $user->counters->map(function ($counter) {
+                return [
+                    'id'       => $counter->id,
+                    'name'     => $counter->name,
+                    'services' => $counter->services->map(fn($s) => [
+                        'id'   => $s->id,
+                        'name' => $s->name,
+                    ]),
+                ];
+            });
         }
 
         // Default route berdasarkan role

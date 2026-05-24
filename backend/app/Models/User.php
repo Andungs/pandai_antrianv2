@@ -33,9 +33,9 @@ class User extends Authenticatable
 
     /* ── Relationships ─────────────────────────── */
 
-    public function counter()
+    public function counters(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsTo(Counter::class, 'counter_id');
+        return $this->belongsToMany(Counter::class);
     }
 
     /* ── Helpers ────────────────────────────────── */
