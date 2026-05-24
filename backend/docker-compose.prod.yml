@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: pandaiantrian-api
     restart: always
+    command: php artisan serve --host=0.0.0.0 --port=8000
     volumes:
       - .:/var/www
     networks:
@@ -23,19 +24,6 @@ services:
     networks:
       cloud-container:
         ipv4_address: 10.10.10.5
-
-  pandaiantrian-queue:
-    build: .
-    container_name: pandaiantrian-queue
-    restart: unless-stopped
-    command: php artisan queue:work database --queue=default --tries=3 --backoff=10,30,60 --sleep=3 --timeout=120
-    volumes:
-      - .:/var/www
-    depends_on:
-      - pandaiantrian-api
-    networks:
-      cloud-container:
-        ipv4_address: 10.10.10.6
 
 networks:
   cloud-container:
