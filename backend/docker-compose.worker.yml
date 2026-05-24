@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker
-    container_name: pandaiantrian_websocket
+    container_name: pandaiantrian-reverb
     restart: always
     command: bash -c "while [ ! -f vendor/autoload.php ]; do sleep 5; done; php artisan reverb:start --host=0.0.0.0 --port=8080"
     volumes:
