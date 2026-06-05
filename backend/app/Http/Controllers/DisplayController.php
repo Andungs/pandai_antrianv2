@@ -61,7 +61,7 @@ class DisplayController extends Controller
     public function services(): JsonResponse
     {
         $services = Service::select('id', 'name', 'prefix_code')
-            ->orderBy('name')
+            ->orderBy('prefix_code')
             ->get()
             ->map(function (Service $service) {
                 $waitingCount = Queue::today()

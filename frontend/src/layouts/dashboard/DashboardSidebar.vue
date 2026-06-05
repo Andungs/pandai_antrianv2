@@ -87,25 +87,42 @@ const auth   = useAuthStore()
         <div v-else class="mb-1 mt-2 h-px mx-1" :class="isSidebarDark ? 'bg-white/5' : 'bg-slate-200'"></div>
 
         <div class="space-y-0.5">
-          <router-link
-            v-for="item in group.items"
-            :key="item.name"
-            :to="item.href"
-            class="relative flex items-center rounded-xl text-sm font-semibold transition-all duration-200 group"
-            :class="[navItemClass(item.href), isCollapsed ? 'px-2 py-2 justify-center' : 'gap-3 px-3 py-2.5']"
-            :title="isCollapsed ? item.name : ''"
-          >
-            <span
-              v-if="isActive(item.href)"
-              class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full"
-              :class="activeBarColor"
-            ></span>
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-all duration-200" :class="iconBoxClass(item.href)">
-              <component :is="item.icon" class="h-4 w-4" />
-            </span>
-            <span v-if="!isCollapsed" class="flex-1 leading-none">{{ item.name }}</span>
-            <ChevronRight v-if="isActive(item.href) && !isCollapsed" class="h-3.5 w-3.5 shrink-0" :class="activeChevronClass" />
-          </router-link>
+          <template v-for="item in group.items" :key="item.name">
+            <!-- External link (target="_blank") -->
+            <a
+              v-if="item.target"
+              :href="item.href"
+              :target="item.target"
+              rel="noopener noreferrer"
+              class="relative flex items-center rounded-xl text-sm font-semibold transition-all duration-200 group no-underline"
+              :class="[navItemClass(item.href), isCollapsed ? 'px-2 py-2 justify-center' : 'gap-3 px-3 py-2.5']"
+              :title="isCollapsed ? item.name : ''"
+            >
+              <span class="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-all duration-200" :class="iconBoxClass(item.href)">
+                <component :is="item.icon" class="h-4 w-4" />
+              </span>
+              <span v-if="!isCollapsed" class="flex-1 leading-none">{{ item.name }}</span>
+            </a>
+            <!-- Internal navigation -->
+            <router-link
+              v-else
+              :to="item.href"
+              class="relative flex items-center rounded-xl text-sm font-semibold transition-all duration-200 group"
+              :class="[navItemClass(item.href), isCollapsed ? 'px-2 py-2 justify-center' : 'gap-3 px-3 py-2.5']"
+              :title="isCollapsed ? item.name : ''"
+            >
+              <span
+                v-if="isActive(item.href)"
+                class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full"
+                :class="activeBarColor"
+              ></span>
+              <span class="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-all duration-200" :class="iconBoxClass(item.href)">
+                <component :is="item.icon" class="h-4 w-4" />
+              </span>
+              <span v-if="!isCollapsed" class="flex-1 leading-none">{{ item.name }}</span>
+              <ChevronRight v-if="isActive(item.href) && !isCollapsed" class="h-3.5 w-3.5 shrink-0" :class="activeChevronClass" />
+            </router-link>
+          </template>
         </div>
       </div>
     </div>

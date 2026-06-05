@@ -12,7 +12,8 @@ export interface MenuItem {
   name: string
   href: string
   icon: any
-  roles: string[]  // role_type yang bisa melihat menu ini
+  roles: string[]  // role_type yang bisa melihat menu ini,
+  target?: string   // optional: '_blank' untuk buka di tab baru
 }
 
 export interface MenuGroup {
@@ -36,6 +37,13 @@ const allMenuGroups: MenuGroup[] = [
     items: [
       { name: 'Dashboard Panggilan', href: '/dashboard/loket', icon: TicketCheck, roles: ['loket', 'superadmin'] },
       { name: 'Riwayat Antrean', href: '/dashboard/loket/history', icon: History, roles: ['loket', 'superadmin'] },
+    ]
+  },
+  {
+    title: 'Public',
+    items: [
+      { name: 'Kiosk', href: '/kiosk', target: '_blank', icon: TicketCheck, roles: ['superadmin', 'loket'] },
+      { name: 'Display', href: '/display', target: '_blank', icon: Monitor, roles: ['superadmin', 'loket'] },
     ]
   },
 ]

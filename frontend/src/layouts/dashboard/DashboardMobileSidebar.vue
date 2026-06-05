@@ -49,20 +49,37 @@ const auth = useAuthStore()
       <div v-for="group in menuGroups" :key="group.title">
         <p class="px-3 mb-2 text-[10px] font-black uppercase tracking-[0.12em]" :class="groupLabelClass">{{ group.title }}</p>
         <div class="space-y-0.5">
-          <router-link
-            v-for="item in group.items"
-            :key="item.name"
-            :to="item.href"
-            @click="emit('close')"
-            class="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all group"
-            :class="navItemClass(item.href)"
-          >
-            <span v-if="isActive(item.href)" class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full" :class="activeBarColor"></span>
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-all" :class="iconBoxClass(item.href)">
-              <component :is="item.icon" class="h-4 w-4" />
-            </span>
-            {{ item.name }}
-          </router-link>
+          <template v-for="item in group.items" :key="item.name">
+            <!-- External link (target="_blank") -->
+            <a
+              v-if="item.target"
+              :href="item.href"
+              :target="item.target"
+              rel="noopener noreferrer"
+              @click="emit('close')"
+              class="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all group no-underline"
+              :class="navItemClass(item.href)"
+            >
+              <span class="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-all" :class="iconBoxClass(item.href)">
+                <component :is="item.icon" class="h-4 w-4" />
+              </span>
+              {{ item.name }}
+            </a>
+            <!-- Internal navigation -->
+            <router-link
+              v-else
+              :to="item.href"
+              @click="emit('close')"
+              class="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all group"
+              :class="navItemClass(item.href)"
+            >
+              <span v-if="isActive(item.href)" class="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-0.5 rounded-full" :class="activeBarColor"></span>
+              <span class="flex h-8 w-8 items-center justify-center rounded-lg shrink-0 transition-all" :class="iconBoxClass(item.href)">
+                <component :is="item.icon" class="h-4 w-4" />
+              </span>
+              {{ item.name }}
+            </router-link>
+          </template>
         </div>
       </div>
     </div>
