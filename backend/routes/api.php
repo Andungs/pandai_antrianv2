@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Dashboard Analytics
         Route::get('/dashboard', [AdminDashboardController::class, 'index']);
         Route::get('/dashboard/history', [AdminDashboardController::class, 'history']);
+        Route::get('/dashboard/service-time', [AdminDashboardController::class, 'serviceTime']);
 
         // CRUD Users
         Route::apiResource('users', \App\Http\Controllers\Admin\AdminUserController::class);

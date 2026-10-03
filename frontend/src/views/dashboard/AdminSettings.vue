@@ -15,8 +15,8 @@ const generatingCert = ref(false)
 async function fetchSettings() {
   loading.value = true
   try {
-    const res = await api.get('/admin/settings')
-    settingsData.value = res.data.data
+    const res = await api.get('/guest/services')
+    settingsData.value = res.data.data.settings
   } catch (e) { console.error(e) } finally { loading.value = false }
 }
 

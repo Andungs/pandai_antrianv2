@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import StatsCard from '@/components/StatsCard.vue'
+import QueueTrendChart from '@/components/QueueTrendChart.vue'
+import ServiceTimeChart from '@/components/ServiceTimeChart.vue'
 import { api } from '@/stores/auth'
 import { BarChart3, Users, Clock, CheckCircle2 } from 'lucide-vue-next'
 
@@ -40,6 +42,12 @@ onMounted(fetchDashboard)
       <StatsCard title="Sudah Dilayani" :value="String(stats.served)" subtitle="Hari ini" variant="emerald" :loading="loading" :icon="CheckCircle2" />
       <StatsCard title="Rata-rata Waktu" :value="`${stats.avg_service_time} mnt`" subtitle="Per layanan" variant="red" :loading="loading" :icon="Clock" />
     </div>
+
+    <!-- Chart Rata-rata Waktu Melayani per Layanan -->
+    <ServiceTimeChart />
+
+    <!-- Chart Tren 7 Hari -->
+    <QueueTrendChart />
 
     <!-- Per Service Table -->
     <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 overflow-hidden">

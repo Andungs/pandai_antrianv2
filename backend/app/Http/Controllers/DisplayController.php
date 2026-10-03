@@ -28,11 +28,18 @@ class DisplayController extends Controller
                     ->latest('called_at')
                     ->first();
 
+                // Sisa antrean menunggu untuk layanan yang dilayani loket ini
+                $waitingCount = Queue::today()
+                    ->whereIn('service_id', $counter->services->pluck('id'))
+                    ->where('status', 'menunggu')
+                    ->count();
+
                 return [
                     'id'            => $counter->id,
                     'name'          => $counter->name,
                     'service_name'  => $counter->services->pluck('name')->join(', '),
                     'officer_name'  => $counter->users->pluck('name')->join(', '),
+                    'waiting_count' => $waitingCount,
                     'current_queue' => $currentQueue ? [
                         'queue_number' => $currentQueue->queue_number,
                         'status'       => $currentQueue->status,
@@ -44,6 +51,7 @@ class DisplayController extends Controller
         return response()->json([
             'data' => [
                 'counters' => $counters,
+                'total_waiting' => Queue::today()->where('status', 'menunggu')->count(),
                 'settings' => [
                     'app_name' => Setting::get('app_name', 'Pandai Antrian'),
                     'app_logo' => Setting::get('app_logo')

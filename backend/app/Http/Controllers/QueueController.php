@@ -43,7 +43,7 @@ class QueueController extends Controller
         $queue->load('service');
 
         // Broadcast update agar tracking page bisa refresh
-        broadcast(new QueueUpdated($queue))->toOthers();
+        broadcast(new QueueUpdated($queue));
 
         return response()->json([
             'data' => [

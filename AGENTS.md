@@ -10,7 +10,7 @@ Aplikasi `Pandai Antrian` menggunakan arsitektur terpisah (Headless API) antara 
 
 ### Backend (API Server)
 - **Framework:** Laravel 11
-- **Database:** SQLite (lokasi: `database/database.sqlite`)
+- **Database:** MariaDB (konfigurasi di `.env`, `DB_CONNECTION=mariadb`)
 - **WebSockets:** Laravel Reverb (Berjalan di port `8099`)
 - **Port API:** Berjalan di port `8092`
 - **Authentication:** Laravel Sanctum (Token-based)
@@ -21,6 +21,7 @@ Aplikasi `Pandai Antrian` menggunakan arsitektur terpisah (Headless API) antara 
 - **Styling:** Tailwind CSS + custom CSS variables
 - **UI Components:** shadcn-vue (Radix Vue), lucide-vue-next, `@vueform/multiselect`
 - **Pusher Client:** `pusher-js` & `laravel-echo` untuk menangkap event WebSocket
+- **Charts:** `@unovis/ts` + `@unovis/vue` (JANGAN gunakan Chart.js/ApexCharts untuk chart baru)
 - **Thermal Printing:** `qz-tray` npm package + composable `useQZTray.ts`
 
 ### Docker Environment (Production)
@@ -47,6 +48,12 @@ Aplikasi `Pandai Antrian` menggunakan arsitektur terpisah (Headless API) antara 
 3. Frontend KIOSK memanggil `GET /api/guest/qz-certs` untuk certificate dan `POST /api/guest/qz-sign` untuk signing.
 4. Composable `useQZTray.ts` mengirim perintah ESC/POS raw ke printer thermal via QZTray WebSocket lokal.
 5. Nama printer dikonfigurasi di tabel `settings` (key: `printer_name`).
+
+### D. Dashboard Analytics (Admin)
+- `GET /api/admin/dashboard/history?from&to` → total/waiting/served per hari. Hanya hari yang punya data, maksimal 7 hari (422 jika lebih).
+- `GET /api/admin/dashboard/service-time?from&to` → rata-rata waktu melayani (`called_at`→`served_at`) dan waktu tunggu (`created_at`→`called_at`) per layanan, dihitung di PHP.
+- Komponen frontend: `QueueTrendChart.vue` dan `ServiceTimeChart.vue` (library: Unovis), dipasang di `AdminDashboard.vue`, masing-masing dengan filter rentang tanggal maks 7 hari.
+- `total_waiting` (semua antrean `menunggu` hari ini) dikirim lewat `GET /api/guest/display` dan payload `QueueUpdated`, ditampilkan di header tengah `DisplayView.vue`.
 
 ### B. Pemanggilan Antrean (LOKET)
 1. Petugas Loket / Superadmin login ke `/dashboard`.
@@ -100,6 +107,7 @@ Bagian ini berisi konfigurasi teknis dan desain yang **TIDAK BOLEH** diubah oleh
 
 2. **Backend API:**
    - Gunakan pendekatan *Thin Controllers, Fat Models/Services* untuk logika antrean yang kompleks.
+   - **Query agregasi:** Hindari fungsi khusus MySQL seperti `TIMESTAMPDIFF`; hitung selisih waktu di PHP/Carbon agar portable antar driver DB (`AdminDashboardController::index` masih memakainya, perlu dimigrasikan).
    - Selalu kembalikan standar *response format* JSON: `['data' => [...], 'message' => '...']`.
 
 3. **User Management:**
@@ -114,6 +122,11 @@ Bagian ini berisi konfigurasi teknis dan desain yang **TIDAK BOLEH** diubah oleh
   2. Pembuatan fitur teknis baru yang mengubah alur (flow) sistem.
   3. Penambahan file konfigurasi inti atau *tools* pihak ketiga.
   **AI harus secara otomatis memperbarui file `AGENTS.md` ini** agar dokumentasi selalu sinkron dengan kondisi *codebase* terbaru tanpa perlu disuruh secara eksplisit oleh `USER`.
+
+---
+
+## 🗣️ 7. Aturan Komunikasi (WAJIB)
+- Jika perintah `USER` **ambigu**, tidak lengkap, atau bisa ditafsirkan lebih dari satu cara, AI **DILARANG langsung melakukan coding/perubahan file**. AI wajib bertanya dan meminta konfirmasi terlebih dahulu, baru mengeksekusi setelah `USER` menjawab.
 
 ---
 *Dokumen ini harus selalu diperbarui jika ada pergeseran arsitektur yang signifikan.*

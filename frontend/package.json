@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@tanstack/vue-table": "^8.21.3",
+    "@unovis/ts": "^1.7.1",
+    "@unovis/vue": "^1.7.1",
     "@vueform/multiselect": "^2.6.11",
     "@vueuse/core": "^14.3.0",
     "axios": "^1.16.1",
