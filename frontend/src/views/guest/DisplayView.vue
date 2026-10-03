@@ -298,11 +298,11 @@ onMounted(() => {
     </header>
 
     <!-- ═══ MAIN DISPLAY ════════════════════════════════════════════════ -->
-    <main class="flex-1 flex relative z-10 p-6 gap-6 overflow-hidden">
+    <main class="flex-1 flex flex-col relative z-10 p-6 gap-6 overflow-y-auto scrollbar-thin">
 
-      <!-- ═══ LEFT: Active Calling Card ═══════════════════════════════ -->
-      <div class="w-2/5 flex flex-col">
-        <div class="flex-1 rounded-3xl overflow-hidden relative">
+      <!-- ═══ TOP CENTER: Active Calling Card ═════════════════════════ -->
+      <div class="w-full max-w-3xl mx-auto flex flex-col shrink-0">
+        <div class="min-h-[420px] flex-1 rounded-3xl overflow-hidden relative">
           <!-- Active Call Card -->
           <div
             v-if="activeCallCounter"
@@ -361,10 +361,11 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- ═══ RIGHT: Counter List with Status ═════════════════════════ -->
-      <div class="flex-1 flex flex-col gap-4 overflow-y-auto scrollbar-thin pr-1">
+      <!-- ═══ BOTTOM: Counter List with Status ════════════════════════ -->
+      <div class="w-full flex flex-col gap-4">
         <h3 class="text-sm font-black text-slate-500 uppercase tracking-widest px-1">Daftar Loket</h3>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
           v-for="(counter, idx) in counters"
           :key="counter.id"
@@ -419,6 +420,7 @@ onMounted(() => {
               <p class="text-xs text-slate-400 mt-1">Menunggu</p>
             </div>
           </div>
+        </div>
         </div>
 
         <!-- Empty state -->
