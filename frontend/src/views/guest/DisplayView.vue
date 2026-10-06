@@ -468,7 +468,7 @@ onMounted(() => {
                 class="font-black tracking-tighter leading-none mb-6"
                 :class="[
                   flashingCounterId === activeCallCounter.counter_id ? 'animate-number-pop' : '',
-                  'text-[8rem] lg:text-[10rem] text-transparent bg-clip-text bg-gradient-to-br',
+                  'text-[10rem] lg:text-[15rem] text-transparent bg-clip-text bg-gradient-to-br',
                   activeColor.gradient
                 ]"
               >
